@@ -8,7 +8,6 @@ const start = () => {
         {command: "/entry", description: "Запись в очередь"},
         {command: "/cancell", description: "Отмена записи в очередь"},
         {command: "/check", description: "Просмотр очереди"},
-        {command: "/delete", description: "удалить человека из очереди {/delete @....}"}
     ]) 
     arrayQueue = []
     arrayQueueID = []
@@ -83,7 +82,7 @@ const start = () => {
                 return bot.sendMessage(chatId,`список команд:\n1) /entry - добавиться в очередь\n2) /cancell - выйти из очереди\n3) /check - посмотреть очередь`)
             }
         }
-        if (text == "/check" || text == "check@writeToTheQueueBot") {
+        if (text == "/check" || text == "/check@writeToTheQueueBot") {
             listOfStudent = ""
             counterStudent = 1
             for(let i = 0; i < arrayQueue.length; i++) {
@@ -92,7 +91,7 @@ const start = () => {
             }
             return bot.sendMessage(chatId,`список записавшихся:\n${listOfStudent}`)
         }
-        if (text == "/cancell" || "/cancell@writeToTheQueueBot") {
+        if (text == "/cancell" || text == "/cancell@writeToTheQueueBot") {
             flag = 0
             for (let i = 0; i< arrayQueue.length; i++) {
                 if (userName == arrayQueue[i]) {
