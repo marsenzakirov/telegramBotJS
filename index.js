@@ -57,7 +57,7 @@ const start = () => {
             userName = "noName"
         }
     
-        if (text == "/entry") {
+        if (text == "/entry" || text == "/entry@writeToTheQueueBot") {
             flag = 0
             for (let i = 0; i < arrayQueue.length; i ++) {
                 if (userName == arrayQueue[i]) {
@@ -74,7 +74,7 @@ const start = () => {
                 return bot.sendMessage(chatId,`Вы успешно записались в очередь, ваше место - ${counter}`)
             }
         }
-        if (text == "/help") {
+        if (text == "/help" || text == "/help@writeToTheQueueBot") {
             
             if (testAdmin(userMSG)) {
                 return bot.sendMessage(chatId,`список команд:\n1) /entry - добавиться в очередь\n2) /cancell - выйти из очереди\n3) /check - посмотреть очеред\n4) /delete 1/2/3/4(или имя пользователя). - удаляет из очереди пользователья`)
@@ -83,7 +83,7 @@ const start = () => {
                 return bot.sendMessage(chatId,`список команд:\n1) /entry - добавиться в очередь\n2) /cancell - выйти из очереди\n3) /check - посмотреть очередь`)
             }
         }
-        if (text == "/check") {
+        if (text == "/check" || text == "check@writeToTheQueueBot") {
             listOfStudent = ""
             counterStudent = 1
             for(let i = 0; i < arrayQueue.length; i++) {
@@ -92,7 +92,7 @@ const start = () => {
             }
             return bot.sendMessage(chatId,`список записавшихся:\n${listOfStudent}`)
         }
-        if (text == "/cancell") {
+        if (text == "/cancell" || "/cancell@writeToTheQueueBot") {
             flag = 0
             for (let i = 0; i< arrayQueue.length; i++) {
                 if (userName == arrayQueue[i]) {
@@ -147,7 +147,7 @@ const start = () => {
                 return bot.sendMessage(chatId, "У вас нет прав доступа к этой команде")
             }
         } 
-        if (text == "/clear") {
+        if (text == "/clear" || text == "/clear@writeToTheQueueBot") {
             if (testAdmin(userMSG) || testGLAdmin(userMSG)){
                 arrayQueue = []
                 arrayQueueID = []
@@ -164,7 +164,6 @@ const start = () => {
                         arrayAdmin.splice(i,1)
                         flag = 1;
                         return bot.sendMessage(chatId, "Вы успешно сняли пользоватлея с должности адмнистратор")
-                        
                     }
                 }
                 if (flag == 0) {
@@ -214,7 +213,6 @@ const start = () => {
             }
         }
     })
-    
     function testAdmin (nameUser) {
         for(let i = 0; i < arrayAdmin.length; i++) {
             if (nameUser == arrayAdmin[i]) {
