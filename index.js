@@ -102,7 +102,7 @@ const start = async () => {
             checkEntry = "Список записавшихся:\n"
             for (let i = 0; i < entryListUsers.length; i++) {
                 if (entryListUsers[i].passed == "true") {
-                    checkEntry += c + ") " + entryListUsers[i].name + "✅\n"
+                    checkEntry += c + ") " + entryListUsers[i].name + " ✅\n"
                 }
                 else {
                     checkEntry += c + ") " + entryListUsers[i].name + "\n"
