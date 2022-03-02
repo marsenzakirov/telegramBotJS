@@ -1,17 +1,28 @@
 {
-  "name": "writetothequeue",
+  "name": "ssh-keygen",
   "version": "1.0.0",
-  "description": "",
+  "description": "C:\\ssh",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js",
     "start": "node index.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "marsen",
   "license": "ISC",
   "dependencies": {
+    "mongodb": "^4.4.0",
+    "node-cron": "^3.0.0",
     "node-telegram-bot-api": "^0.56.0",
-    "nodemon": "^2.0.15"
-  }
+    "nodemon": "^2.0.15",
+    "shelljs": "^0.8.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marsenzakirov/telegramBotJS.git"
+  },
+  "bugs": {
+    "url": "https://github.com/marsenzakirov/telegramBotJS/issues"
+  },
+  "homepage": "https://github.com/marsenzakirov/telegramBotJS#readme"
 }
