@@ -4,6 +4,7 @@ const token = "5201253455:AAGlAjJtLgUHVdfzZuq30TWHFdknjcvi8Aw"
 const bot = new TelegramAPI(token, {polling: true})
 
 const start = () => {
+    bot.sendMessage(514046902, "тест") 
     bot.setMyCommands ([
         {command: "/entry", description: "Запись в очередь"},
         {command: "/cancell", description: "Отмена записи в очередь"},
