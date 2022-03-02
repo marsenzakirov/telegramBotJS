@@ -235,7 +235,7 @@ const start = async () => {
                     return bot.sendMessage(chatId, "Поздравляю со сдачей") 
                 }
                 else {
-                    return bot.sendMessage(chatId, `Вы еще не записались, чтобы записаться введите ${/entry}`) 
+                    return bot.sendMessage(chatId, `Вы еще не записались, чтобы записаться введите "/entry"`) 
                 }    
             }
             else {
