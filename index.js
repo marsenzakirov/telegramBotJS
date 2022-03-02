@@ -4,8 +4,8 @@ const {MongoClient} = require("mongodb")
 const cron = require('node-cron');
 let shell = require('shelljs')
 
-const client = new MongoClient("mongodb+srv://marsen:Marsen20031912.@cluster0.zydrr.mongodb.net/TelegramBotForEntry?retryWrites=true&w=majority")
-const token = "5218552174:AAEHtLbTqtU8mFj8TuBlUcEtrll5wkAYfUk"
+const client = new MongoClient()
+const token = ""
 const bot = new TelegramAPI(token, {polling: true})
 
 
