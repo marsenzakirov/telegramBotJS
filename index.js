@@ -1,49 +1,37 @@
 const TelegramAPI = require("node-telegram-bot-api") 
 const command = require("nodemon/lib/config/command")
-const token = "5201253455:AAGlAjJtLgUHVdfzZuq30TWHFdknjcvi8Aw"
+const {MongoClient} = require("mongodb")
+const cron = require('node-cron');
+let shell = require('shelljs')
+
+const client = new MongoClient("mongodb+srv://marsen:Marsen20031912.@cluster0.zydrr.mongodb.net/TelegramBotForEntry?retryWrites=true&w=majority")
+const token = "5218552174:AAEHtLbTqtU8mFj8TuBlUcEtrll5wkAYfUk"
 const bot = new TelegramAPI(token, {polling: true})
 
-const start = () => {
-    bot.sendMessage(-514046902, "тест") 
+
+
+const start = async () => {
+    try {
+        await client.connect()
+        console.log("connected")
+    }
+    catch(Err) {
+        console.log(Err)
+    }
+
     bot.setMyCommands ([
         {command: "/entry", description: "Запись в очередь"},
         {command: "/cancell", description: "Отмена записи в очередь"},
         {command: "/check", description: "Просмотр очереди"},
     ]) 
-    arrayQueue = []
-    arrayQueueID = []
-    arrayAdmin = ["N77778465053"]
-    arrayOwnerID = [884350908]
-    arrayGLAdmin = ["N77778465053"]
-    counter = 0
-    count = 0
+    bot.on("message", async msg => {
+        const Users = client.db().collection('Users')
 
-    bot.on("message", msg => {
         const text = msg.text
         const chatId = msg.chat.id
         const userId = msg.from.id
         userMSG = msg.from.username
-        var days = [
-            'Воскресенье',
-            'Понедельник',
-            'Вторник',
-            'Среда',
-            'Четверг',
-            'Пятница',
-            'Суббота'
-          ];
-        var d = new Date();
-        var n = d.getDay();
-        var h = d.getHours()
-        
-        if (days[n] == "Вторник" && count == 0) {
-            arrayQueue = []
-            arrayQueueID = []
-            count = 1
-        }
-        if (days[n] == "Средра") {
-            count = 0
-        }
+
         if (typeof msg.from.last_name != "undefined" && typeof msg.from.first_name != "undefined") {
             userName =  msg.from.first_name +  msg.from.last_name
         }
@@ -56,27 +44,48 @@ const start = () => {
         else {
             userName = "noName"
         }
-    
+        user = await Users.findOne({id: `${userId}`})
+        if (!user) {
+            await Users.insertOne({
+                name: `${userName}`,
+                id: `${userId}`,
+                userNameTelegram: `${userMSG}`,
+                admin: "false",
+                GLAdmin: "false",
+                entry: "false",
+                owner: "false",
+                passed: "false"
+            })
+        }
+        user = await Users.findOne({id: `${userId}`})
         if (text == "/entry" || text == "/entry@writeToTheQueueBot") {
-            flag = 0
-            for (let i = 0; i < arrayQueue.length; i ++) {
-                if (userName == arrayQueue[i]) {
-                    flag = 1
+            if(user.entry == "false") {
+                const entryListUsers = await Users.find(({entry: "true"})).toArray()
+                Users.updateOne(
+                    {id: `${userId}`},
+                    {
+                        $set: {
+                            entry: "true"
+                        }
+                    }
+                )
+
+                lenEntry = 1;
+                checkEntry = "Список записавшихся:\n"
+
+                for (let i = 0; i < entryListUsers.length; i++) {
+                    lenEntry++
                 }
-            }
-            if (flag == 1) {
-                return bot.sendMessage(chatId,`Вы уже записались в очередь, чтобы повторно записаться, отмените предыдущую запись с помощью команды "/cancell"`)  
+
+                return bot.sendMessage(chatId,`Вы успешно записались в очередь, ваше место - ${lenEntry}`)
             }
             else {
-                counter++
-                arrayQueue.push(userName);
-                arrayQueueID.push(userId)
-                return bot.sendMessage(chatId,`Вы успешно записались в очередь, ваше место - ${counter}`)
+                return bot.sendMessage(chatId,`Вы уже записались в очередь, чтобы повторно записаться, отмените предыдущую запись с помощью команды "/cancell"`)  
             }
         }
         if (text == "/help" || text == "/help@writeToTheQueueBot") {
             
-            if (testAdmin(userMSG)) {
+            if (user.admin == "true" || user.GLAdmin == "true") {
                 return bot.sendMessage(chatId,`список команд:\n1) /entry - добавиться в очередь\n2) /cancell - выйти из очереди\n3) /check - посмотреть очеред\n4) /delete 1/2/3/4(или имя пользователя). - удаляет из очереди пользователья`)
             }
             else {
@@ -84,44 +93,54 @@ const start = () => {
             }
         }
         if (text == "/check" || text == "/check@writeToTheQueueBot") {
-            listOfStudent = ""
-            counterStudent = 1
-            for(let i = 0; i < arrayQueue.length; i++) {
-                listOfStudent+= counterStudent + ") " + arrayQueue[i] + "\n"
-                counterStudent++
+            try {
+            const entryListUsers = await Users.find(({entry: "true"})).toArray()
+            c = 1;
+            checkEntry = "Список записавшихся:\n"
+            for (let i = 0; i < entryListUsers.length; i++) {
+                if (entryListUsers[i].passed == "true") {
+                    checkEntry += c + ") " + entryListUsers[i].name + "✅\n"
+                }
+                else {
+                    checkEntry += c + ") " + entryListUsers[i].name + "\n"
+                }
+                c++
             }
-            return bot.sendMessage(chatId,`список записавшихся:\n${listOfStudent}`)
+            return bot.sendMessage(chatId,`${checkEntry}`)
+            }
+            catch {
+                return bot.sendMessage(chatId,`список пуст`)
+            }
+
         }
         if (text == "/cancell" || text == "/cancell@writeToTheQueueBot") {
-            flag = 0
-            for (let i = 0; i< arrayQueue.length; i++) {
-                if (userName == arrayQueue[i]) {
-                    indexImposter = i;
-                    arrayQueue.splice(i,1)
-                    bot.sendMessage(chatId, "Вы успешно удалили себя из очереди")
-                    flag = 1
-                    counter -=1
-                    break
-                }
-            }
-            if (flag = 0) {
-                return bot.sendMessage(chatId, "Вас нет в очереди")
+            if (user.entry == "true") {
+                Users.updateOne(
+                    {id: `${userId}`},
+                    {
+                        $set: {
+                            entry: "false"
+                        }
+                    }
+                )
+                return bot.sendMessage(chatId, "Вы успешно вышли из очереди")
             }
             else {
-                for (indexImposter; indexImposter < arrayQueue.length - 1; indexImposter++) {
-                    bot.sendMessage(arrayQueueID[indexImposter + 1], `${userName} Вышел из очереди и вы сдвинулись на ${indexImposter} место`)
-                }
+                return bot.sendMessage(chatId, "Вас нет в очереди")
             }
-            return 0;
         }
         if (text.substring(0,9) == "/addAdmin") {
-            console.log(testGLAdmin(userMSG))
-            console.log(userMSG)
-            console.log(arrayGLAdmin)
-            if (userId == 884350908 || testGLAdmin(userMSG)) {
+            if (user.owner == "true" || user.admin == "true" || user.GLAdmin == "true") {
                 nameAdmin = text.substring(10)
                 if (nameAdmin[0] == "@") {
-                    arrayAdmin.push(text.substring(11))
+                    Users.updateOne(
+                        {userNameTelegram: `${text.substring(11)}`},
+                        {
+                            $set: {
+                                admin: "true"
+                            }
+                        }
+                    )
                     return bot.sendMessage(chatId, "Вы успешно добавили нового администратора")
                 }
                 else {
@@ -131,12 +150,19 @@ const start = () => {
             else {
                 return bot.sendMessage(chatId, "У вас нет прав доступа к этой команде")
             }
-        } 
+        }
         if (text.substring(0,11) == "/addGLAdmin") {
-            if (userId == 884350908) {
+            if (user.owner == "true") {
                 nameGLAdmin = text.substring(12)
                 if (nameGLAdmin[0] == "@") {
-                    arrayGLAdmin.push(text.substring(13))
+                    Users.updateOne(
+                        {userNameTelegram: `${text.substring(13)}`},
+                        {
+                            $set: {
+                                GLadmin: "true"
+                            }
+                        }
+                    )
                     return bot.sendMessage(chatId, "Вы успешно добавили нового главного администратора")
                 }
                 else {
@@ -146,93 +172,107 @@ const start = () => {
             else {
                 return bot.sendMessage(chatId, "У вас нет прав доступа к этой команде")
             }
-        } 
+        }
         if (text == "/clear" || text == "/clear@writeToTheQueueBot") {
-            if (testAdmin(userMSG) || testGLAdmin(userMSG)){
-                arrayQueue = []
-                arrayQueueID = []
-                counter = 0
+            if (user.owner == "true" || user.admin == "true" || user.GLAdmin == "true"){
+                Users.updateMany(
+                    {entry: "true"},
+                    {
+                        $set: {
+                            entry: "false",
+                            passed: "false"
+                        }
+                    }
+                )
                 return bot.sendMessage(chatId, "Список обновлен")
+            }
+            else {
+                return bot.sendMessage(chatId, "У вас нет доступа к этой команде") 
             }
         }
         if (text.substring(0,12) == "/deleteAdmin") {
-            if (testGLAdmin(userMSG)) {
+            if (user.owner == "true" || user.GLAdmin == "true") {
                 nameAdmin = text.substring(14)
-                flag = 0;
-                for (let i = 0; i < arrayAdmin.length; i++) {
-                    if (nameAdmin == arrayAdmin[i]) {
-                        arrayAdmin.splice(i,1)
-                        flag = 1;
-                        return bot.sendMessage(chatId, "Вы успешно сняли пользоватлея с должности адмнистратор")
+                userAdmin = Users.findOne({userNameTelegram: `${nameAdmin}`})
+                if (!userAdmin) {
+                    if (userAdmin.admin == "true") {
+                        Users.updateOne(
+                            {userNameTelegram: `${nameAdmin}`},
+                            {
+                                $set: {
+                                    admin: "false"
+                                }
+                            }
+                        )
+                        return bot.sendMessage(chatId, "Пользователь был снят с должности администратор") 
+                    }
+                    else {
+                        return bot.sendMessage(chatId, "Пользователь не является администратором") 
                     }
                 }
-                if (flag == 0) {
-                    return bot.sendMessage(chatId, "Не удалось найти пользователя")
+                else {
+                    return bot.sendMessage(chatId, "Пользователь не найден") 
                 }
             }
             else {
                 return bot.sendMessage(chatId, "У вас нет прав доступа к этой команде") 
             }
         }
-        if(text.substring(0,7) == "/delete") {
-            if (testAdmin(userMSG) || testGLAdmin(userMSG)) {
-                nameUser = text.substring(8)
-                console.log(typeof(nameUser))
-                flag = 0
-                if (isNaN(nameUser)) {
-                    for (let i = 0; i < arrayQueue.length; i++) {
-                        if (nameUser == arrayQueue[i]) {
-                            arrayQueue.splice(i,1)
-                            flag = 1
-                            break
+        if (text == "/passed") {
+            if (user.passed == "false") {
+                if (user.entry == "true") {
+                    Users.updateMany (
+                        {id: `${userId}`},
+                        {
+                            $set: {
+                                passed: "true"
+                            }
                         }
-                    }
-                    if (flag == 0) {
-                        return bot.sendMessage(chatId, "пользователь не найден")
-                    }
-                    else {
-                        counter-=1
-                        return bot.sendMessage(chatId, "Пользователь был исключен из очереди")
-                        
-                    }
+                    )
+                    return bot.sendMessage(chatId, "Поздравляю со сдачей") 
                 }
-                if (!isNaN(nameUser)) {
-                    if (nameUser <= counter && nameUser >=1) {
-                        arrayQueue.splice(nameUser-1,1)
-                        counter-=1
-                        return bot.sendMessage(chatId, "Пользователь был исключен из очереди")
-                        
-                    }
-                    else {
-                        return bot.sendMessage(chatId, "пользователь не найден")
-                    }
-                }
+                else {
+                    return bot.sendMessage(chatId, `Вы еще не записались, чтобы записаться введите ${entry}`) 
+                }    
             }
             else {
-                return bot.sendMessage(chatId, "У вас нет прав доступа к этой команде")
+                return bot.sendMessage(chatId, "Вы уже сдали") 
             }
         }
-        if (text == "/chatID") {
+        
+        if (text == "/noPassed") {
+            if (user.passed = "true") {
+                Users.updateMany (
+                    {id: `${userId}`},
+                    {
+                        $set: {
+                            passed: "false"
+                        }
+                    }
+                )
+                return bot.sendMessage(chatId, "Вы успешно отменили") 
+            }
+            else {
+                return bot.sendMessage(chatId, "ты Дурачек?") 
+            }
+        }
+        if (text == "/ChatID") {
             myChat = chatId
             return bot.sendMessage(chatId, `${chatId}`) 
         }
-    })
-    function testAdmin (nameUser) {
-        for(let i = 0; i < arrayAdmin.length; i++) {
-            if (nameUser == arrayAdmin[i]) {
-                return true
+    })    
+    cron.schedule('* 10 12 * * */2', async () => {
+        Users.updateMany(
+            {entry: "true"},
+            {
+                $set: {
+                    entry: "false",
+                    passed: "false"
+                }
             }
-        }
-        return false
-    }
-    function testGLAdmin (nameUser) {
-        for(let i = 0; i < arrayGLAdmin.length; i++) {
-            if (nameUser == arrayGLAdmin[i]) {
-                return true
-            }
-        }
-        return false
-    }
+        )
+        await bot.sendMessage(-514046902, "Обновление списка, можете снова записаться")   
+    });
 }
 
 start()
