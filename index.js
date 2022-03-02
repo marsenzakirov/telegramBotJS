@@ -1,10 +1,12 @@
+require('dotenv').config()
 const TelegramAPI = require("node-telegram-bot-api") 
 const command = require("nodemon/lib/config/command")
 const {MongoClient} = require("mongodb")
 const cron = require('node-cron');
 let shell = require('shelljs')
 
-
+const client = new MongoClient(process.env.MONO_DB_CLIENT)
+const token = process.env.TOKEN_FOR_TELEGRAMM
 const bot = new TelegramAPI(token, {polling: true})
 
 
