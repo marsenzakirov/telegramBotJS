@@ -24,6 +24,8 @@ const start = async () => {
         {command: "/entry", description: "Запись в очередь"},
         {command: "/cancell", description: "Отмена записи в очередь"},
         {command: "/check", description: "Просмотр очереди"},
+        {command: "/clear", description: "очистка списка (Для админов)"},
+        {command: "/passed", description: "Подтверждение сдачи лабороторных"},
     ]) 
     bot.on("message", async msg => {
         const Users = client.db().collection('Users')
@@ -219,7 +221,7 @@ const start = async () => {
                 return bot.sendMessage(chatId, "У вас нет прав доступа к этой команде") 
             }
         }
-        if (text == "/passed") {
+        if (text == "/passed" || text == "/passed@writeToTheQueueBot") {
             if (user.passed == "false") {
                 if (user.entry == "true") {
                     Users.updateMany (
@@ -241,7 +243,7 @@ const start = async () => {
             }
         }
         
-        if (text == "/noPassed") {
+        if (text == "/noPassed" || text == "/noPassed@writeToTheQueueBot") {
             if (user.passed = "true") {
                 Users.updateMany (
                     {id: `${userId}`},
