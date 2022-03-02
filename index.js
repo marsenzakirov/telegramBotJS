@@ -211,6 +211,10 @@ const start = () => {
                 return bot.sendMessage(chatId, "У вас нет прав доступа к этой команде")
             }
         }
+        if (text == "/chatID") {
+            myChat = chatId
+            return bot.sendMessage(chatId, `${chatId}`) 
+        }
     })
     function testAdmin (nameUser) {
         for(let i = 0; i < arrayAdmin.length; i++) {
