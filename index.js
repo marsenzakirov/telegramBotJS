@@ -4,8 +4,7 @@ const {MongoClient} = require("mongodb")
 const cron = require('node-cron');
 let shell = require('shelljs')
 
-const client = new MongoClient(clientMongoDB)
-const token = tokenTelegram
+
 const bot = new TelegramAPI(token, {polling: true})
 
 
