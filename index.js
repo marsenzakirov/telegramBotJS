@@ -89,10 +89,10 @@ const start = async () => {
         if (text == "/help" || text == "/help@writeToTheQueueBot") {
             
             if (user.admin == "true" || user.GLAdmin == "true") {
-                return bot.sendMessage(chatId,`список команд:\n1) /entry - добавиться в очередь\n2) /cancell - выйти из очереди\n3) /check - посмотреть очеред\n4) /delete 1/2/3/4(или имя пользователя). - удаляет из очереди пользователья`)
+                return bot.sendMessage(chatId,`список команд:\n1) /entry - добавиться в очередь\n2) /cancell - выйти из очереди\n3) /check - посмотреть очеред\n4) /passed -Подтверждение сдачи лабороторных \n 5) clear - очистка списка `)
             }
             else {
-                return bot.sendMessage(chatId,`список команд:\n1) /entry - добавиться в очередь\n2) /cancell - выйти из очереди\n3) /check - посмотреть очередь`)
+                return bot.sendMessage(chatId,`список команд:\n1) /entry - добавиться в очередь\n2) /cancell - выйти из очереди\n3) /check - посмотреть очеред\n4) /passed -Подтверждение сдачи лабороторных \n `)
             }
         }
         if (text == "/check" || text == "/check@writeToTheQueueBot") {
