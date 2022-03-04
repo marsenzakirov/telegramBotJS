@@ -102,7 +102,6 @@ const start = async () => {
             }
         }
         if (text == "/check" || text == "/check@writeToTheQueueBot") {
-            try {
             const entryListUsers = await Users.find(({entry: "true"})).sort({counter:1}).toArray
             checkEntry = "Список записавшихся:\n"
             for (let i = 0; i < entryListUsers.length; i++) {
@@ -120,10 +119,6 @@ const start = async () => {
             }
             return bot.sendMessage(chatId,`${checkEntry}`)
             }
-            catch {
-                return bot.sendMessage(chatId,`список пуст`)
-            }
-
         }
         if (text == "/cancell" || text == "/cancell@writeToTheQueueBot") {
             if (user.entry == "true") {
