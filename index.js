@@ -106,6 +106,9 @@ const start = async () => {
             const entryListUsers = await Users.find(({entry: "true"})).sort({counter:1}).toArray
             checkEntry = "Список записавшихся:\n"
             for (let i = 0; i < entryListUsers.length; i++) {
+                console.log(entryListUsers[i].counter)
+            }
+            for (let i = 0; i < entryListUsers.length; i++) {
                 if(entryListUsers[i].counter == i+1) {
                     if (entryListUsers[i].passed == "true") {
                         checkEntry += entryListUsers[i].counter + ") " + entryListUsers[i].name + "✅\n"
