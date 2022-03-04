@@ -118,7 +118,6 @@ const start = async () => {
                 }
             }
             return bot.sendMessage(chatId,`${checkEntry}`)
-            }
         }
         if (text == "/cancell" || text == "/cancell@writeToTheQueueBot") {
             if (user.entry == "true") {
