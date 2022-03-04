@@ -57,18 +57,24 @@ const start = async () => {
                 GLAdmin: "false",
                 entry: "false",
                 owner: "false",
-                passed: "false"
+                passed: "false",
+                counter: 0
             })
         }
         user = await Users.findOne({id: `${userId}`})
         if (text == "/entry" || text == "/entry@writeToTheQueueBot") {
             if(user.entry == "false") {
                 const entryListUsers = await Users.find(({entry: "true"})).toArray()
+                c = 1;
+                for (let i = 0; i < entryListUsers.length; i++) {
+                    c +=1
+                }
                 Users.updateOne(
                     {id: `${userId}`},
                     {
                         $set: {
-                            entry: "true"
+                            entry: "true",
+                            counter: c
                         }
                     }
                 )
@@ -97,17 +103,17 @@ const start = async () => {
         }
         if (text == "/check" || text == "/check@writeToTheQueueBot") {
             try {
-            const entryListUsers = await Users.find(({entry: "true"})).toArray()
-            c = 1;
+            const entryListUsers = await Users.find(({entry: "true"})).toArray().sort({counter:1})
             checkEntry = "Список записавшихся:\n"
             for (let i = 0; i < entryListUsers.length; i++) {
-                if (entryListUsers[i].passed == "true") {
-                    checkEntry += c + ") " + entryListUsers[i].name + " ✅\n"
+                if(entryListUsers[i].counter == i+1) {
+                    if (entryListUsers[i].passed == "true") {
+                        checkEntry += entryListUsers[i].counter + ") " + entryListUsers[i].name + "✅\n"
+                    }
+                    else {
+                        checkEntry += entryListUsers[i].counter + ") " + entryListUsers[i].name + "\n"
+                    }
                 }
-                else {
-                    checkEntry += c + ") " + entryListUsers[i].name + "\n"
-                }
-                c++
             }
             return bot.sendMessage(chatId,`${checkEntry}`)
             }
