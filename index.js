@@ -25,7 +25,8 @@ const start = async () => {
         {command: "/cancell", description: "Отмена записи в очередь"},
         {command: "/check", description: "Просмотр очереди"},
         {command: "/clear", description: "очистка списка (Для админов)"},
-        {command: "/passed", description: "Подтверждение сдачи лабороторных"}
+        {command: "/passed", description: "Подтверждение сдачи лабороторных"},
+        {command: "/noPassed", description: "Отмена подтверждения сдачи лабороторных"}
     ]) 
     bot.on("message", async msg => {
         const Users = client.db().collection('Users')
@@ -273,7 +274,8 @@ const start = async () => {
             {
                 $set: {
                     entry: "false",
-                    passed: "false"
+                    passed: "false",
+                    counter: 0
                 }
             }
         )
