@@ -103,7 +103,7 @@ const start = async () => {
         }
         if (text == "/check" || text == "/check@writeToTheQueueBot") {
             try {
-            const entryListUsers = await Users.find(({entry: "true"})).toArray().sort({counter:1})
+            const entryListUsers = await Users.find(({entry: "true"})).sort({counter:1}).toArray
             checkEntry = "Список записавшихся:\n"
             for (let i = 0; i < entryListUsers.length; i++) {
                 if(entryListUsers[i].counter == i+1) {
